@@ -4,6 +4,10 @@ const apiUrl = "http://api.openweathermap.org/geo/1.0/direct";
 const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast";
 const buttonEl = document.querySelector("#searchBtn");
 const cityNameEl = document.querySelector("#cityName");
+const displayEl = document.querySelector("#displayData");
+
+
+
 
 userInputEl.addEventListener("change", () => {
     const userInput = userInputEl.value;
@@ -28,9 +32,22 @@ userInputEl.addEventListener("change", () => {
                 .then(forecastData => {
                     // Handle the forecast data here
                     console.log("Here's the info:", forecastData);
+                    
+                    function showWeather(){
+                        const weatherCard = `<div class="card mx-auto" style="width: 18rem;">
+                        <img src="..." class="card-img-top" alt="...">
+                        <div class="card-body">
+                          <p class="card-text">${forecastData.list[0].weather[0].description}</p>
+                        </div>
+                      </div>`;
+                      displayEl.innerHTML += weatherCard;
+                      
+                    }
 
                     buttonEl.addEventListener("click", function(){
                         cityNameEl.textContent = forecastData.city.name;
+                        showWeather();
+
                     });
                 })
                 .catch(error => {
