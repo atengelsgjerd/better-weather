@@ -1,22 +1,24 @@
 const userInputEl = document.querySelector("#userInput");
-const apiKey = "b42df58e582cf042e5545e718636c1df";
+const apiKey = "b42df58e582cf042e5545e718636c1df"; 
 const apiUrl = "http://api.openweathermap.org/geo/1.0/direct";
 const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast";
 const buttonEl = document.querySelector("#searchBtn");
 const cityNameEl = document.querySelector("#cityName");
 const displayEl = document.querySelector("#displayData");
+const cloudImage = './assets/images/cloudy.jpg';
+const rainImage = './assets/images/rainy.jpg';
+const fiveDayForecast = document.querySelector("#fiveDay");
 
 
 
-
-userInputEl.addEventListener("change", () => {
+const displayContent = () => {
     const userInput = userInputEl.value;
     const stateCode = ""; // Add the state code if needed
     const countryCode = ""; // Add the country code if needed
     const limit = 1; // Set the limit for the number of results
 
     const geoApiUrl = `${apiUrl}?q=${userInput},${stateCode},${countryCode}&limit=${limit}&appid=${apiKey}`;
-
+    console.log("hello", geoApiUrl)
     fetch(geoApiUrl)
         .then(response => response.json())
         .then(data => {
@@ -34,21 +36,39 @@ userInputEl.addEventListener("change", () => {
                     console.log("Here's the info:", forecastData);
                     
                     function showWeather(){
-                        const weatherCard = `<div class="card mx-auto" style="width: 18rem;">
-                        <img src="..." class="card-img-top" alt="...">
+                        let imageUrl = '';
+                        if(forecastData.list[0].weather[0].main === "Rain"){
+                            imageUrl = rainImage;
+                        } else if(forecastData.list[0].weather[0].main === "Clouds"){
+                            imageUrl = cloudImage;
+                        }
+                        const weatherCard = 
+                        
+                        `<div class="card mx-auto" style="width: 18rem;">
+                        <h2>${dayjs(forecastData.list[0].dt_txt).format('MM/DD/YYYY')}</h2>
+                        <img src="${imageUrl}" class="card-img-top" alt="...">
                         <div class="card-body">
                           <p class="card-text">${forecastData.list[0].weather[0].description}</p>
                         </div>
                       </div>`;
                       displayEl.innerHTML += weatherCard;
-                      
+                      for(let i = 0; i < forecastData.list.length; i+=8){
+                        const fiveDayCard = 
+                        
+                        `<div class="card mx-auto" style="width: 18rem;">
+                        <h2>${dayjs(forecastData.list[i].dt_txt).format('MM/DD/YYYY')}</h2>
+                        <img src="${imageUrl}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <p class="card-text">${forecastData.list[i].weather[0].description}</p>
+                        </div>
+                        </div>`;
+                        fiveDayForecast.innerHTML += fiveDayCard;
+                      }
                     }
-
-                    buttonEl.addEventListener("click", function(){
-                        cityNameEl.textContent = forecastData.city.name;
-                        showWeather();
-
-                    });
+                    cityNameEl.textContent = forecastData.city.name;
+                    
+                    showWeather();
+                    
                 })
                 .catch(error => {
                     console.error("Error fetching forecast data:", error);
@@ -59,5 +79,6 @@ userInputEl.addEventListener("change", () => {
         });
         
         
-});
+};
+buttonEl.addEventListener("click", displayContent);
 
