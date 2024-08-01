@@ -1,5 +1,5 @@
 const userInputEl = document.querySelector("#userInput");
-const apiKey = "b42df58e582cf042e5545e718636c1df"; 
+const apiKey = "b42df58e582cf042e5545e718636c1df";
 const apiUrl = "http://api.openweathermap.org/geo/1.0/direct";
 const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast";
 const buttonEl = document.querySelector("#searchBtn");
@@ -13,70 +13,72 @@ const fiveDayForecast = document.querySelector("#fiveDay");
 
 
 const displayContent = () => {
-    const userInput = userInputEl.value;
-    const stateCode = ""; // Add the state code if needed
-    const countryCode = ""; // Add the country code if needed
-    const limit = 1; // Set the limit for the number of results
+  const userInput = userInputEl.value;
+  const stateCode = ""; // Add the state code if needed
+  const countryCode = ""; // Add the country code if needed
+  const limit = 1; // Set the limit for the number of results
 
-    const geoApiUrl = `${apiUrl}?q=${userInput},${stateCode},${countryCode}&limit=${limit}&appid=${apiKey}`;
+  const geoApiUrl = `${apiUrl}?q=${userInput},${stateCode},${countryCode}&limit=${limit}&appid=${apiKey}`;
 
-    
-    fetch(geoApiUrl)
+
+  fetch(geoApiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const cityName = data[0].name;
+
+      // let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+      // searchHistory.push(cityName);
+      // localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+
+      // displaySearchHistory();
+      // Assuming the API response contains latitude and longitude
+      const latitude = data[0].lat;
+      const longitude = data[0].lon;
+
+      const forecastApiUrl = `${forecastUrl}?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`;
+
+      // Make a second API request using the latitude and longitude
+      fetch(forecastApiUrl)
         .then(response => response.json())
-        .then(data => {
-            const cityName = data[0].name;
+        .then(forecastData => {
+          // Handle the forecast data here
+          console.log("Here's the info:", forecastData);
 
-            let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-            searchHistory.push(cityName);
-            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+          showWeather(cityName, forecastData);
 
-            displaySearchHistory();
-            // Assuming the API response contains latitude and longitude
-            const latitude = data[0].lat;
-            const longitude = data[0].lon;
 
-            const forecastApiUrl = `${forecastUrl}?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
-
-            // Make a second API request using the latitude and longitude
-            fetch(forecastApiUrl)
-                .then(response => response.json())
-                .then(forecastData => {
-                    // Handle the forecast data here
-                    console.log("Here's the info:", forecastData);
-
-                    showWeather(cityName, forecastData);
-                    
-                    
-                })
-                .catch(error => {
-                    console.error("Error fetching forecast data:", error);
-                });
         })
         .catch(error => {
-            console.error("Error fetching location data:", error);
+          console.error("Error fetching forecast data:", error);
         });
-        
-        
-};
+    })
+    .catch(error => {
+      console.error("Error fetching location data:", error);
+    });
 
-const displaySearchHistory = () => {
-    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    const searchHistoryEl = document.querySelector("#searchHistory");
-    searchHistoryEl.innerHTML = '';
 
 };
+
+// const displaySearchHistory = () => {
+//     const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+//     const searchHistoryEl = document.querySelector("#searchHistory");
+//     searchHistoryEl.innerHTML = '';
+
+// };
 
 const showWeather = (cityName, forecastData) => {
-    let weatherIconClass = '';
+  displayEl.innerHTML = '';
+  fiveDayForecast.innerHTML = '';
+  let weatherIconClass = '';
 
-    if(forecastData.list[0].weather[0].main === "Rain"){
-        weatherIconClass = 'bi bi-cloud-rain';
-    } else if(forecastData.list[0].weather[0].main === "Clouds"){
-        weatherIconClass = 'bi bi-clouds';
-    }
+  if (forecastData.list[0].weather[0].main === "Rain") {
+    weatherIconClass = 'bi bi-cloud-rain';
+  } else if (forecastData.list[0].weather[0].main === "Clouds") {
+    weatherIconClass = 'bi bi-clouds';
+  }
 
-    const weatherCard = 
-    
+  const weatherCard =
+
     `<div class="card mx-auto" style="width: 18rem;">
     <h2>${dayjs(forecastData.list[0].dt_txt).format('MM/DD/YYYY')}<i class="${weatherIconClass}"></i></h2>
     
@@ -87,22 +89,22 @@ const showWeather = (cityName, forecastData) => {
 
   displayEl.innerHTML += weatherCard;
 
-  for(let i = 0; i < forecastData.list.length; i+=8){
+  for (let i = 0; i < forecastData.list.length; i += 8) {
 
     let weatherIconClass = '';
 
-    if(forecastData.list[i].weather[0].main === "Rain"){
-        weatherIconClass = 'bi bi-cloud-rain';
-    } else if(forecastData.list[i].weather[0].main === "Clouds"){
-        weatherIconClass = 'bi bi-clouds';
-    } else if(forecastData.list[i].weather[0].main === "Clear"){
-        weatherIconClass = 'bi bi-brightness-high';
+    if (forecastData.list[i].weather[0].main === "Rain") {
+      weatherIconClass = 'bi bi-cloud-rain';
+    } else if (forecastData.list[i].weather[0].main === "Clouds") {
+      weatherIconClass = 'bi bi-clouds';
+    } else if (forecastData.list[i].weather[0].main === "Clear") {
+      weatherIconClass = 'bi bi-brightness-high';
     }
-  
 
-    const fiveDayCard = 
-    
-    `<div class="card mx-auto" style="width: 18rem;">
+
+    const fiveDayCard =
+
+      `<div class="card mx-auto" style="width: 18rem;">
     <h2>${dayjs(forecastData.list[i].dt_txt).format('MM/DD/YYYY')}<i  class="${weatherIconClass}"></i></h2>
     
     <div class="card-body">
@@ -114,38 +116,44 @@ const showWeather = (cityName, forecastData) => {
   cityNameEl.textContent = forecastData.city.name;
 };
 
-let searchHistory = [];
+let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
-function addToSearchHistory(cityName){
-    searchHistory.push(cityName);
-    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+function addToSearchHistory(cityName) {
+  if (!searchHistory.includes(cityName)) {
+    searchHistory.push(cityName)
+  }
+  localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
 }
 function renderSearchHistory() {
-    const searchHistoryDiv = document.getElementById('searchHistory');
-    searchHistoryDiv.innerHTML = '';
-  
-    searchHistory.forEach(city => {
-      const button = document.createElement('button');
-      button.textContent = city;
-      button.classList.add('btn', 'btn-secondary', 'm-1');
-      button.addEventListener('click', () => {
-        // Implement functionality to display weather data for the selected city
-        // For example, you can call a function to fetch weather data for the selected city
-        console.log(`Display weather data for ${city}`);
-      });
-  
-      searchHistoryDiv.appendChild(button);
+  const searchHistoryDiv = document.getElementById('searchHistory');
+  searchHistoryDiv.innerHTML = '';
+
+  searchHistory.forEach(city => {
+    const button = document.createElement('button');
+    button.textContent = city;
+    button.classList.add('btn', 'btn-secondary', 'm-1');
+    button.addEventListener('click', () => {
+      // Implement functionality to display weather data for the selected city
+      // For example, you can call a function to fetch weather data for the selected city
+      userInputEl.value = city;
+      displayContent();
     });
-  }
-  
-  // Event listener for the search button
-  document.getElementById('searchBtn').addEventListener('click', function() {
-    const userInput = document.getElementById('userInput').value;
-    addToSearchHistory(userInput);
+
+    searchHistoryDiv.appendChild(button);
   });
+}
+
+// Event listener for the search button
+document.getElementById('searchBtn').addEventListener('click', function () {
+  const userInput = document.getElementById('userInput').value;
+  addToSearchHistory(userInput);
+  renderSearchHistory();
+});
 
 
 
 // showWeather();
 buttonEl.addEventListener("click", displayContent);
+
+renderSearchHistory();
 
