@@ -26,3 +26,16 @@ i {
     padding: 10px;
     margin: 10px;
 }
+#searchBtn {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+#searchHistory {
+    margin-left: 5px;
+}
+
+div input {
+    margin-left: 10px;
+}

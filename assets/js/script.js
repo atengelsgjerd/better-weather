@@ -5,8 +5,6 @@ const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast";
 const buttonEl = document.querySelector("#searchBtn");
 const cityNameEl = document.querySelector("#cityName");
 const displayEl = document.querySelector("#displayData");
-const cloudImage = './assets/images/cloudy.jpg';
-const rainImage = './assets/images/rainy.jpg';
 const fiveDayForecast = document.querySelector("#fiveDay");
 
 
@@ -79,11 +77,13 @@ const showWeather = (cityName, forecastData) => {
 
   const weatherCard =
 
-    `<div class="card mx-auto" style="width: 18rem;">
-    <h2>${dayjs(forecastData.list[0].dt_txt).format('MM/DD/YYYY')}<i class="${weatherIconClass}"></i></h2>
+    `<div class="card mx-auto" style="width: 36rem;">
+    <h2>${forecastData.city.name} (${dayjs(forecastData.list[0].dt_txt).format('MM/DD/YYYY')})<i class="${weatherIconClass}"></i></h2>
     
     <div class="card-body">
-      <p class="card-text">${forecastData.list[0].weather[0].description}</p>
+      <p class="card-text"><b>Temp: ${forecastData.list[0].main.temp}°F</b></p>
+      <p class="card-text"><b>Wind: ${forecastData.list[0].wind.speed}MPH</b></p>
+      <p class="card-text"><b>Humidity: ${forecastData.list[0].main.humidity}%</b></p>
     </div>
   </div>`;
 
@@ -108,7 +108,9 @@ const showWeather = (cityName, forecastData) => {
     <h2>${dayjs(forecastData.list[i].dt_txt).format('MM/DD/YYYY')}<i  class="${weatherIconClass}"></i></h2>
     
     <div class="card-body">
-        <p class="card-text">${forecastData.list[i].weather[0].description}</p>
+      <p class="card-text"><b>Temp: ${forecastData.list[i].main.temp}°F</b></p>
+      <p class="card-text"><b>Wind: ${forecastData.list[i].wind.speed}MPH</b></p>
+      <p class="card-text"><b>Humidity: ${forecastData.list[i].main.humidity}%</b></p>
     </div>
     </div>`;
     fiveDayForecast.innerHTML += fiveDayCard;
@@ -131,7 +133,7 @@ function renderSearchHistory() {
   searchHistory.forEach(city => {
     const button = document.createElement('button');
     button.textContent = city;
-    button.classList.add('btn', 'btn-secondary', 'm-1');
+    button.classList.add('btn', 'btn-secondary', 'm-1', 'col-3');
     button.addEventListener('click', () => {
       // Implement functionality to display weather data for the selected city
       // For example, you can call a function to fetch weather data for the selected city
